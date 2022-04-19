@@ -9,11 +9,11 @@ namespace FrameworkDesign.Example {
             transform.Find("BtnStart").GetComponent<Button>()
                 .onClick.AddListener(() => {
                     gameObject.SetActive(false);
-                    GetArchitecture().SendCommand<StartGameCommand>();
+                    this.SendCommand<StartGameCommand>();
                 });
         }
 
-        public IArchitecture GetArchitecture() {
+        IArchitecture IBelongToArchitecture.GetArchitecture() {
             return PointGame.Interface;
         }
     }

@@ -7,6 +7,8 @@ namespace FrameworkDesign {
 
         T GetModel<T>() where T : class, IModel;
 
+        T GetSystem<T>() where T : class, ISystem;
+
         void RegisterModel<T>(T model) where T : IModel;
 
         void RegisterUtility<T>(T utility) where T : IUtility;
@@ -16,6 +18,14 @@ namespace FrameworkDesign {
         void SendCommand<T>() where T : ICommand, new();
 
         void SendCommand<T>(T command) where T : ICommand;
+
+        void SendEvent<T>() where T : new();
+
+        void SendEvent<T>(T e);
+
+        IUnregister Register<T>(Action<T> onEvent);
+
+        void Unregister<T>(Action<T> onEvent);
     }
 
     public abstract class Architecture<T> : IArchitecture where T : Architecture<T>, new() {
@@ -29,6 +39,8 @@ namespace FrameworkDesign {
         private readonly List<ISystem> mSystems = new List<ISystem>();
 
         public static Action<T> OnRegisterPatch = architecture => { };
+
+        private ITypeEventSystem mTypeEventSystem = new TypeEventSystem();
 
         public static IArchitecture Interface {
             get {
@@ -107,6 +119,10 @@ namespace FrameworkDesign {
             return mContainer.Get<T0>();
         }
 
+        public T0 GetSystem<T0>() where T0 : class, ISystem {
+            return mContainer.Get<T0>();
+        }
+
         public void SendCommand<T0>() where T0 : ICommand, new() {
             var command = new T0();
             command.SetArchitecture(this);
@@ -118,6 +134,22 @@ namespace FrameworkDesign {
             command.SetArchitecture(this);
             command.Execute();
             command.SetArchitecture(null);
+        }
+
+        public void SendEvent<T0>() where T0 : new() {
+            mTypeEventSystem.Send<T0>();
+        }
+
+        public void SendEvent<T0>(T0 e) {
+            mTypeEventSystem.Send(e);
+        }
+
+        public IUnregister Register<T0>(Action<T0> onEvent) {
+            return mTypeEventSystem.Register(onEvent);
+        }
+
+        public void Unregister<T0>(Action<T0> onEvent) {
+            mTypeEventSystem.Unregister(onEvent);
         }
     }
 }
