@@ -11,11 +11,11 @@ namespace FrameworkDesign {
                 if (!value.Equals(mValue)) {
                     mValue = value;
 
-                    OnValueChanged?.Invoke();
+                    OnValueChanged?.Invoke(value);
                 }
             }
         }
 
-        public Action OnValueChanged;
+        public Action<T> OnValueChanged;
     }
 }
