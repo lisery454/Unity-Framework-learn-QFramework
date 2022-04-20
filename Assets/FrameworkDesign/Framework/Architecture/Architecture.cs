@@ -75,18 +75,6 @@ namespace FrameworkDesign {
         //用来给子类写注册方法
         protected abstract void Init();
 
-        //获取
-        public static T0 Get<T0>() where T0 : class {
-            MakeSureArchitecture();
-            return mArchitecture.mContainer.Get<T0>();
-        }
-
-        //注册
-        protected static void Register<T0>(T0 instance) {
-            MakeSureArchitecture();
-            mArchitecture.mContainer.Register(instance);
-        }
-
         public void RegisterModel<T0>(T0 model) where T0 : IModel {
             model.SetArchitecture(mArchitecture);
             mContainer.Register(model);

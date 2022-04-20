@@ -1,28 +1,22 @@
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 
 namespace FrameworkDesign.Example {
-    public class GameStartPanel : MonoBehaviour, IController {
+    public class GamePanel : MonoBehaviour, IController {
+        private ICountDownSystem mCountDownSystem;
         private IGameModel mGameModel;
 
-        private void Start() {
-            transform.Find("BtnStart").GetComponent<Button>()
-                .onClick.AddListener(() => {
-                    gameObject.SetActive(false);
-                    this.SendCommand<StartGameCommand>();
-                });
-
-            transform.Find("BtnBuyLife").GetComponent<Button>()
-                .onClick.AddListener(() => { this.SendCommand<BuyLifeCommand>(); });
-
+        private void Awake() {
+            mCountDownSystem = this.GetSystem<ICountDownSystem>();
             mGameModel = this.GetModel<IGameModel>();
 
             mGameModel.Gold.RegisterOnValueChanged(OnGoldValueChanged);
             mGameModel.Life.RegisterOnValueChanged(OnLifeValueChanged);
+            mGameModel.Score.RegisterOnValueChanged(OnScoreValueChanged);
 
-            //第一次初始化调用
             OnGoldValueChanged(mGameModel.Gold.Value);
             OnLifeValueChanged(mGameModel.Life.Value);
+            OnScoreValueChanged(mGameModel.Score.Value);
         }
 
         private void OnLifeValueChanged(int life) {
@@ -30,18 +24,29 @@ namespace FrameworkDesign.Example {
         }
 
         private void OnGoldValueChanged(int gold) {
-            transform.Find("BtnBuyLife").gameObject.SetActive(gold > 0);
-
             transform.Find("GoldText").GetComponent<Text>().text = "金币:" + gold;
+        }
+
+        private void OnScoreValueChanged(int score) {
+            transform.Find("ScoreText").GetComponent<Text>().text = "分数:" + score;
+        }
+
+        private void Update() {
+            if (Time.frameCount % 20 == 0) {
+                transform.Find("CountDownText").GetComponent<Text>().text = mCountDownSystem.CurrentRemainSeconds + "s";
+                mCountDownSystem.Update();
+            }
         }
 
         private void OnDestroy() {
             mGameModel.Gold.UnregisterOnValueChanged(OnGoldValueChanged);
             mGameModel.Life.UnregisterOnValueChanged(OnLifeValueChanged);
+            mGameModel.Score.UnregisterOnValueChanged(OnScoreValueChanged);
             mGameModel = null;
+            mCountDownSystem = null;
         }
 
-        IArchitecture IBelongToArchitecture.GetArchitecture() {
+        public IArchitecture GetArchitecture() {
             return PointGame.Interface;
         }
     }

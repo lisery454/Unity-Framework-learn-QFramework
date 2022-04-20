@@ -11,11 +11,34 @@ namespace FrameworkDesign {
                 if (!value.Equals(mValue)) {
                     mValue = value;
 
-                    OnValueChanged?.Invoke(value);
+                    mOnValueChanged?.Invoke(value);
                 }
             }
         }
 
-        public Action<T> OnValueChanged;
+        private Action<T> mOnValueChanged;
+
+        public IUnregister RegisterOnValueChanged(Action<T> onValueChanged) {
+            mOnValueChanged += onValueChanged;
+            return new BindablePropertyUnregister<T>() {
+                BindableProperty = this,
+                OnValueChanged = onValueChanged
+            };
+        }
+
+        public void UnregisterOnValueChanged(Action<T> onValueChanged) {
+            mOnValueChanged -= onValueChanged;
+        }
+    }
+
+    public class BindablePropertyUnregister<T> : IUnregister where T : IEquatable<T> {
+        public BindableProperty<T> BindableProperty { get; set; }
+        public Action<T> OnValueChanged { get; set; }
+
+        public void Unregister() {
+            BindableProperty.UnregisterOnValueChanged(OnValueChanged);
+            BindableProperty = null;
+            OnValueChanged = null;
+        }
     }
 }

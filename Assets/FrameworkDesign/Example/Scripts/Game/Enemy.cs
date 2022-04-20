@@ -3,7 +3,7 @@ using UnityEngine;
 namespace FrameworkDesign.Example {
     public class Enemy : MonoBehaviour, IController {
         private void OnMouseDown() {
-            Destroy(gameObject);
+            gameObject.SetActive(false);
             this.SendCommand<KillEnemyCommand>();
         }
 

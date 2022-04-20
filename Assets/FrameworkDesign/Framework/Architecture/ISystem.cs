@@ -1,5 +1,6 @@
 namespace FrameworkDesign {
-    public interface ISystem : ICanSetArchitecture, ICanGetModel, ICanGetUtility, ICanRegisterEvent, ICanSendEvent {
+    public interface ISystem : ICanSetArchitecture, ICanGetModel, ICanGetUtility, ICanRegisterEvent, ICanSendEvent,
+        ICanGetSystem {
         void Init();
     }
 
